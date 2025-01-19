@@ -20,8 +20,8 @@
 
 ((int, slice, slice), slice) $Ticket$_fun_getHolder((int, slice, slice) $self) impure inline_ref {
     var (($self'seqno, $self'parent, $self'holder)) = $self;
-    var $fresh$ret_3 = $self'holder;
-    return (($self'seqno, $self'parent, $self'holder), $fresh$ret_3);
+    var $fresh$ret_4 = $self'holder;
+    return (($self'seqno, $self'parent, $self'holder), $fresh$ret_4);
 }
 
 ;;

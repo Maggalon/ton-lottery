@@ -95,4 +95,8 @@ contract TONLottery with Deployable, Ownable {
         });
     }
 
+    get fun lotteryLiveTime(): Int {
+        return now() - self.deployTime;
+    }
+
 }

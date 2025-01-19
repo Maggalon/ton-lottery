@@ -1,6 +1,6 @@
 # TACT Compilation Report
 Contract: TONLottery
-BOC Size: 1758 bytes
+BOC Size: 1776 bytes
 
 # Types
 Total Types: 17
@@ -74,7 +74,9 @@ TLB: `null`
 Signature: `null`
 
 # Get Methods
-Total Get Methods: 1
+Total Get Methods: 2
+
+## lotteryLiveTime
 
 ## owner
 

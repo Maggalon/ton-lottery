@@ -20,8 +20,14 @@
 
 ((slice, int, int, int, int), int) $TONLottery$_fun_getLotteryLiveTime((slice, int, int, int, int) $self) impure inline_ref {
     var (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)) = $self;
-    var $fresh$ret_7 = ($global_now() - $self'deployTime);
-    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), $fresh$ret_7);
+    var $fresh$ret_9 = ($global_now() - $self'deployTime);
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), $fresh$ret_9);
+}
+
+((slice, int, int, int, int), int) $TONLottery$_fun_lotteryLiveTime((slice, int, int, int, int) $self) impure inline_ref {
+    var (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)) = $self;
+    var $fresh$ret_10 = ($global_now() - $self'deployTime);
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), $fresh$ret_10);
 }
 
 ((slice, int, int, int, int), ()) $TONLottery$_fun_requireOwner((slice, int, int, int, int) $self) impure inline_ref {
@@ -32,8 +38,8 @@
 
 ((slice, int, int, int, int), slice) $TONLottery$_fun_owner((slice, int, int, int, int) $self) impure inline_ref {
     var (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)) = $self;
-    var $fresh$ret_8 = $self'owner;
-    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), $fresh$ret_8);
+    var $fresh$ret_11 = $self'owner;
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), $fresh$ret_11);
 }
 
 ;;
@@ -101,6 +107,12 @@
 ;;
 ;; Get methods of a Contract TONLottery
 ;;
+
+_ %lotteryLiveTime() method_id(111261) {
+    var self = $TONLottery$_contract_load();
+    var res = self~$TONLottery$_fun_lotteryLiveTime();
+    return res;
+}
 
 _ %owner() method_id(83229) {
     var self = $TONLottery$_contract_load();

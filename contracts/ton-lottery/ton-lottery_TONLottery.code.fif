@@ -41,6 +41,7 @@ PROGRAM{
   DECLPROC $SendParameters$_constructor_bounce_to_value_mode_body_code_data
   DECLPROC $Ticket$_init_child
   DECLPROC $TONLottery$_fun_getLotteryLiveTime
+  DECLPROC $TONLottery$_fun_lotteryLiveTime
   DECLPROC $TONLottery$_fun_forward
   DECLPROC $TONLottery$_fun_notify
   DECLPROC $TONLottery$_fun_requireOwner
@@ -57,6 +58,7 @@ PROGRAM{
   DECLPROC $TONLottery$_internal_text_8bd7dfb4e54bc7a587fcd3d02b7ae6cd1f6c6dd3a1f8a8c556d00b9e361e6ab1
   DECLPROC $TONLottery$_internal_binary_InternalSendAmount
   DECLPROC $TONLottery$_internal_binary_Deploy
+  111261 DECLMETHOD %lotteryLiveTime
   83229 DECLMETHOD %owner
   115390 DECLMETHOD lazy_deployment_completed
   DECLPROC $TONLottery$_contract_router_internal
@@ -490,6 +492,11 @@ PROGRAM{
     s3 PUSH
     SUB
   }>
+  $TONLottery$_fun_lotteryLiveTime PROCREF:<{
+        NOW
+    s3 PUSH
+    SUB
+  }>
   $TONLottery$_fun_forward PROCREF:<{
     PUSHNULL
     PUSHNULL
@@ -714,6 +721,11 @@ PROGRAM{
     $DeployOk$_constructor_queryId INLINECALLDICT
     $DeployOk$_store_cell INLINECALLDICT
     $TONLottery$_fun_notify INLINECALLDICT
+  }>
+  %lotteryLiveTime PROC:<{
+    $TONLottery$_contract_load INLINECALLDICT
+    $TONLottery$_fun_lotteryLiveTime INLINECALLDICT
+    5 1 BLKDROP2
   }>
   %owner PROC:<{
     $TONLottery$_contract_load INLINECALLDICT

@@ -117,6 +117,9 @@ int $global_send((int, slice, int, int, cell, cell, cell) $params) impure inline
 ;; $TONLottery$_fun_getLotteryLiveTime
 ((slice, int, int, int, int), int) $TONLottery$_fun_getLotteryLiveTime((slice, int, int, int, int) $self) impure inline_ref;
 
+;; $TONLottery$_fun_lotteryLiveTime
+((slice, int, int, int, int), int) $TONLottery$_fun_lotteryLiveTime((slice, int, int, int, int) $self) impure inline_ref;
+
 ;; $TONLottery$_fun_forward
 ((slice, int, int, int, int), ()) $TONLottery$_fun_forward((slice, int, int, int, int) $self, slice $to, cell $body, int $bounce, tuple $init) impure inline_ref;
 
