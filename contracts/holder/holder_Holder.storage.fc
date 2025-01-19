@@ -1,0 +1,90 @@
+;;
+;; Type: SendParameters
+;; TLB: _ bounce:bool to:address value:int257 mode:int257 body:Maybe ^cell code:Maybe ^cell data:Maybe ^cell = SendParameters
+;;
+
+((int, slice, int, int, cell, cell, cell)) $SendParameters$_constructor_to_body_value_mode(slice $to, cell $body, int $value, int $mode) inline {
+    return (true, $to, $value, $mode, $body, null(), null());
+}
+
+;;
+;; Type: InternalSendAmount
+;; Header: 0x1071e1af
+;; TLB: internal_send_amount#1071e1af addr:address amount:coins = InternalSendAmount
+;;
+
+builder $InternalSendAmount$_store(builder build_0, (slice, int) v) inline {
+    var (v'addr, v'amount) = v;
+    build_0 = store_uint(build_0, 275898799, 32);
+    build_0 = __tact_store_address(build_0, v'addr);
+    build_0 = build_0.store_coins(v'amount);
+    return build_0;
+}
+
+cell $InternalSendAmount$_store_cell((slice, int) v) inline {
+    return $InternalSendAmount$_store(begin_cell(), v).end_cell();
+}
+
+((slice, int)) $InternalSendAmount$_constructor_addr_amount(slice $addr, int $amount) inline {
+    return ($addr, $amount);
+}
+
+;;
+;; Type: InternalAddAmount
+;; Header: 0x60d42457
+;; TLB: internal_add_amount#60d42457 amount:coins = InternalAddAmount
+;;
+
+(slice, ((int))) $InternalAddAmount$_load(slice sc_0) inline {
+    throw_unless(129, sc_0~load_uint(32) == 1624515671);
+    var v'amount = sc_0~load_coins();
+    return (sc_0, (v'amount));
+}
+
+;;
+;; Type: Holder
+;;
+
+builder $Holder$_store(builder build_0, (slice, slice, int) v) inline {
+    var (v'parent, v'addr, v'amount) = v;
+    build_0 = __tact_store_address(build_0, v'parent);
+    build_0 = __tact_store_address(build_0, v'addr);
+    build_0 = build_0.store_coins(v'amount);
+    return build_0;
+}
+
+(slice, ((slice, slice, int))) $Holder$_load(slice sc_0) inline {
+    var v'parent = sc_0~__tact_load_address();
+    var v'addr = sc_0~__tact_load_address();
+    var v'amount = sc_0~load_coins();
+    return (sc_0, (v'parent, v'addr, v'amount));
+}
+
+(slice, ((slice, slice))) $Holder$init$_load(slice sc_0) inline {
+    var v'addr = sc_0~__tact_load_address();
+    var v'parent = sc_0~__tact_load_address();
+    return (sc_0, (v'addr, v'parent));
+}
+
+(slice, slice, int) $Holder$_contract_load() impure inline_ref {
+    slice $sc = get_data().begin_parse();
+    __tact_context_sys = $sc~load_ref();
+    int $loaded = $sc~load_int(1);
+    if ($loaded) {
+        return $sc~$Holder$_load();
+    } else {
+        ;; Allow only workchain deployments
+        throw_unless(137, my_address().preload_uint(11) == 1024);
+        (slice $addr, slice $parent) = $sc~$Holder$init$_load();
+        $sc.end_parse();
+        return $Holder$_contract_init($addr, $parent);
+    }
+}
+
+() $Holder$_contract_store((slice, slice, int) v) impure inline {
+    builder b = begin_cell();
+    b = b.store_ref(__tact_context_sys);
+    b = b.store_int(true, 1);
+    b = $Holder$_store(b, v);
+    set_data(b.end_cell());
+}

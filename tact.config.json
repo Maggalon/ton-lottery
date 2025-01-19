@@ -1,0 +1,20 @@
+{
+    "$schema": "http://raw.githubusercontent.com/tact-lang/tact/main/grammar/configSchema.json",
+    "projects": [
+        {
+            "name": "ton-lottery",
+            "path": "./contracts/ton-lottery.tact",
+            "output": "./contracts/ton-lottery"
+        },
+        {
+            "name": "holder",
+            "path": "./contracts/holder.tact",
+            "output": "./contracts/holder"
+        },
+        {
+            "name": "ticket",
+            "path": "./contracts/ticket.tact",
+            "output": "./contracts/ticket"
+        }
+    ]
+}

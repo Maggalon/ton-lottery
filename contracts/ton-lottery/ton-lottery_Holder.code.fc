@@ -1,0 +1,107 @@
+#pragma version =0.4.4;
+#pragma allow-post-modification;
+#pragma compute-asm-ltr;
+
+#include "ton-lottery_Holder.headers.fc";
+#include "ton-lottery_Holder.stdlib.fc";
+#include "ton-lottery_Holder.storage.fc";
+
+;;
+;; Contract Holder functions
+;;
+
+(slice, slice, int) $Holder$_contract_init(slice $addr, slice $parent) impure inline_ref {
+    var (($self'parent, $self'addr, $self'amount)) = (null(), null(), null());
+    $self'addr = $addr;
+    $self'parent = $parent;
+    $self'amount = 0;
+    return ($self'parent, $self'addr, $self'amount);
+}
+
+;;
+;; Receivers of a Contract Holder
+;;
+
+(((slice, slice, int)), ()) $Holder$_internal_binary_InternalAddAmount((slice, slice, int) $self, (int) $msg) impure inline {
+    var ($self'parent, $self'addr, $self'amount) = $self;
+    var ($msg'amount) = $msg;
+    throw_unless(54404, ( __tact_slice_eq_bits($self'parent, __tact_context_get_sender()) ));
+    $self'amount = ($self'amount + $msg'amount);
+    return (($self'parent, $self'addr, $self'amount), ());
+}
+
+((slice, slice, int), ()) $Holder$_internal_text_e7ac5b1ffe9b77668a111d29d525818112685339a7b945eb31c2a97b9f3e3404((slice, slice, int) $self) impure inline {
+    var ($self'parent, $self'addr, $self'amount) = $self;
+    throw_unless(54404, ( __tact_slice_eq_bits($self'parent, __tact_context_get_sender()) ));
+    $global_send($SendParameters$_constructor_to_body_value_mode(__tact_context_get_sender(), $InternalSendAmount$_store_cell($InternalSendAmount$_constructor_addr_amount($self'addr, $self'amount)), 0, 130));
+    return (($self'parent, $self'addr, $self'amount), ());
+}
+
+;;
+;; Get methods of a Contract Holder
+;;
+
+_ lazy_deployment_completed() method_id {
+    return get_data().begin_parse().load_int(1);
+}
+
+;;
+;; Routing of a Contract Holder
+;;
+
+((slice, slice, int), int) $Holder$_contract_router_internal((slice, slice, int) self, int msg_bounced, slice in_msg) impure inline_ref {
+    ;; Handle bounced messages
+    if (msg_bounced) {
+        return (self, true);
+    }
+    
+    ;; Parse incoming message
+    int op = 0;
+    if (slice_bits(in_msg) >= 32) {
+        op = in_msg.preload_uint(32);
+    }
+    
+    
+    ;; Receive InternalAddAmount message
+    if (op == 1624515671) {
+        var msg = in_msg~$InternalAddAmount$_load();
+        self~$Holder$_internal_binary_InternalAddAmount(msg);
+        return (self, true);
+    }
+    
+    ;; Text Receivers
+    if (op == 0) {
+        var text_op = slice_hash(in_msg);
+        
+        ;; Receive "Send amount" message
+        if (text_op == 0xe7ac5b1ffe9b77668a111d29d525818112685339a7b945eb31c2a97b9f3e3404) {
+            self~$Holder$_internal_text_e7ac5b1ffe9b77668a111d29d525818112685339a7b945eb31c2a97b9f3e3404();
+            return (self, true);
+        }
+    }
+    
+    return (self, false);
+}
+
+() recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
+    
+    ;; Context
+    var cs = in_msg_cell.begin_parse();
+    var msg_flags = cs~load_uint(4);
+    var msg_bounced = -(msg_flags & 1);
+    slice msg_sender_addr = __tact_verify_address(cs~load_msg_addr());
+    __tact_context = (msg_bounced, msg_sender_addr, msg_value, cs);
+    __tact_context_sender = msg_sender_addr;
+    
+    ;; Load contract data
+    var self = $Holder$_contract_load();
+    
+    ;; Handle operation
+    int handled = self~$Holder$_contract_router_internal(msg_bounced, in_msg);
+    
+    ;; Throw if not handled
+    throw_unless(130, handled);
+    
+    ;; Persist state
+    $Holder$_contract_store(self);
+}

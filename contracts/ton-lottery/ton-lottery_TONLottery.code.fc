@@ -1,0 +1,200 @@
+#pragma version =0.4.4;
+#pragma allow-post-modification;
+#pragma compute-asm-ltr;
+
+#include "ton-lottery_TONLottery.headers.fc";
+#include "ton-lottery_TONLottery.stdlib.fc";
+#include "ton-lottery_TONLottery.constants.fc";
+#include "ton-lottery_TONLottery.storage.fc";
+
+;;
+;; Contract TONLottery functions
+;;
+
+(slice, int, int, int, int) $TONLottery$_contract_init() impure inline_ref {
+    var (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)) = (null(), 0, null(), false, false);
+    $self'owner = __tact_context_get_sender();
+    $self'deployTime = $global_now();
+    return ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished);
+}
+
+((slice, int, int, int, int), int) $TONLottery$_fun_getLotteryLiveTime((slice, int, int, int, int) $self) impure inline_ref {
+    var (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)) = $self;
+    var $fresh$ret_7 = ($global_now() - $self'deployTime);
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), $fresh$ret_7);
+}
+
+((slice, int, int, int, int), ()) $TONLottery$_fun_requireOwner((slice, int, int, int, int) $self) impure inline_ref {
+    var (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)) = $self;
+    throw_unless(132, ( __tact_slice_eq_bits($self'owner, __tact_context_get_sender()) ));
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), ());
+}
+
+((slice, int, int, int, int), slice) $TONLottery$_fun_owner((slice, int, int, int, int) $self) impure inline_ref {
+    var (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)) = $self;
+    var $fresh$ret_8 = $self'owner;
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), $fresh$ret_8);
+}
+
+;;
+;; Receivers of a Contract TONLottery
+;;
+
+((slice, int, int, int, int), ()) $TONLottery$_internal_text_0c469e8b322dda36ea5c61b0b8b02c1c88d99368201551ad6eeae8c60a2ef820((slice, int, int, int, int) $self) impure inline {
+    var ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished) = $self;
+    ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)~$TONLottery$_fun_requireOwner();
+    $self'deployTime = $global_now();
+    $self'isActive = true;
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), ());
+}
+
+(((slice, int, int, int, int)), ()) $TONLottery$_internal_binary_BuyTickets((slice, int, int, int, int) $self, (int) $msg) impure inline {
+    var ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished) = $self;
+    var ($msg'numberOfTickets) = $msg;
+    throw_unless(3645, (~ $self'isActive));
+    throw_unless(51754, ($Context$_get_value(__tact_context_get()) >= (1000000000 * $msg'numberOfTickets)));
+    var ($holderInit'code, $holderInit'data) = $Holder$_init_child(__tact_context_sys, __tact_context_get_sender(), $global_myAddress());
+    $global_send($SendParameters$_constructor_to_body_value_mode_code_data($global_contractAddress(($holderInit'code, $holderInit'data)), $InternalAddAmount$_store_cell($InternalAddAmount$_constructor_amount(($msg'numberOfTickets * 1000000000))), 50000000, 2, $holderInit'code, $holderInit'data));
+    repeat ($msg'numberOfTickets) {
+        $self'ticketNumber = ($self'ticketNumber + 1);
+        var ($ticketInit'code, $ticketInit'data) = $Ticket$_init_child(__tact_context_sys, $self'ticketNumber, $global_myAddress());
+        $global_send($SendParameters$_constructor_to_body_value_mode_code_data($global_contractAddress(($ticketInit'code, $ticketInit'data)), $InternalSetHolder$_store_cell($InternalSetHolder$_constructor_holder(__tact_context_get_sender())), 50000000, 2, $ticketInit'code, $ticketInit'data));
+    }
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), ());
+}
+
+((slice, int, int, int, int), ()) $TONLottery$_internal_text_c2ee689813dff3971c62264be1f72a72e865773b77239b1bdff66cbc75caa3f2((slice, int, int, int, int) $self) impure inline {
+    var ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished) = $self;
+    ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)~$TONLottery$_fun_requireOwner();
+    throw_unless(30274, $self'isActive);
+    throw_unless(25074, (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)~$TONLottery$_fun_getLotteryLiveTime() >= 10));
+    throw_unless(20821, ($self'ticketNumber > 0));
+    int $winnerTicket = $global_random(1, ($self'ticketNumber + 1));
+    $global_send($SendParameters$_constructor_to_body_value_mode($global_contractAddress($Ticket$_init_child(__tact_context_sys, $winnerTicket, $global_myAddress())), __gen_cell_comment_7276e3adb1b4c34af9f0c13ce18fb84a3fd6ba8a48455fc3d0c9a7eec2e120c5(), (($global_myBalance() / 100) * 5), 2));
+    $self'isFinished = true;
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), ());
+}
+
+((slice, int, int, int, int), ()) $TONLottery$_internal_text_8bd7dfb4e54bc7a587fcd3d02b7ae6cd1f6c6dd3a1f8a8c556d00b9e361e6ab1((slice, int, int, int, int) $self) impure inline {
+    var ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished) = $self;
+    throw_unless(25074, ( ((($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)~$TONLottery$_fun_getLotteryLiveTime() >= 10)) ? ($self'isFinished) : (false) ));
+    $global_send($SendParameters$_constructor_to_body_value_mode($global_contractAddress($Holder$_init_child(__tact_context_sys, __tact_context_get_sender(), $global_myAddress())), __gen_cell_comment_e7ac5b1ffe9b77668a111d29d525818112685339a7b945eb31c2a97b9f3e3404(), 20000000, 2));
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), ());
+}
+
+(((slice, int, int, int, int)), ()) $TONLottery$_internal_binary_InternalSendAmount((slice, int, int, int, int) $self, (slice, int) $msg) impure inline {
+    var ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished) = $self;
+    var ($msg'addr, $msg'amount) = $msg;
+    throw_unless(25074, ( ((($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)~$TONLottery$_fun_getLotteryLiveTime() >= 10)) ? ($self'isFinished) : (false) ));
+    throw_unless(50846, ( __tact_slice_eq_bits($global_contractAddress($Holder$_init_child(__tact_context_sys, $msg'addr, $global_myAddress())), __tact_context_get_sender()) ));
+    $global_send($SendParameters$_constructor_to_value_mode($msg'addr, $msg'amount, 2));
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), ());
+}
+
+(((slice, int, int, int, int)), ()) $TONLottery$_internal_binary_Deploy((slice, int, int, int, int) $self, (int) $deploy) impure inline {
+    var ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished) = $self;
+    var ($deploy'queryId) = $deploy;
+    ($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished)~$TONLottery$_fun_notify($DeployOk$_store_cell($DeployOk$_constructor_queryId($deploy'queryId)));
+    return (($self'owner, $self'ticketNumber, $self'deployTime, $self'isActive, $self'isFinished), ());
+}
+
+;;
+;; Get methods of a Contract TONLottery
+;;
+
+_ %owner() method_id(83229) {
+    var self = $TONLottery$_contract_load();
+    var res = self~$TONLottery$_fun_owner();
+    return res;
+}
+
+_ lazy_deployment_completed() method_id {
+    return get_data().begin_parse().load_int(1);
+}
+
+;;
+;; Routing of a Contract TONLottery
+;;
+
+((slice, int, int, int, int), int) $TONLottery$_contract_router_internal((slice, int, int, int, int) self, int msg_bounced, slice in_msg) impure inline_ref {
+    ;; Handle bounced messages
+    if (msg_bounced) {
+        return (self, true);
+    }
+    
+    ;; Parse incoming message
+    int op = 0;
+    if (slice_bits(in_msg) >= 32) {
+        op = in_msg.preload_uint(32);
+    }
+    
+    
+    ;; Receive BuyTickets message
+    if (op == 4242936982) {
+        var msg = in_msg~$BuyTickets$_load();
+        self~$TONLottery$_internal_binary_BuyTickets(msg);
+        return (self, true);
+    }
+    
+    ;; Receive InternalSendAmount message
+    if (op == 275898799) {
+        var msg = in_msg~$InternalSendAmount$_load();
+        self~$TONLottery$_internal_binary_InternalSendAmount(msg);
+        return (self, true);
+    }
+    
+    ;; Receive Deploy message
+    if (op == 2490013878) {
+        var msg = in_msg~$Deploy$_load();
+        self~$TONLottery$_internal_binary_Deploy(msg);
+        return (self, true);
+    }
+    
+    ;; Text Receivers
+    if (op == 0) {
+        var text_op = slice_hash(in_msg);
+        
+        ;; Receive "Start lottery" message
+        if (text_op == 0x0c469e8b322dda36ea5c61b0b8b02c1c88d99368201551ad6eeae8c60a2ef820) {
+            self~$TONLottery$_internal_text_0c469e8b322dda36ea5c61b0b8b02c1c88d99368201551ad6eeae8c60a2ef820();
+            return (self, true);
+        }
+        
+        ;; Receive "Define winner" message
+        if (text_op == 0xc2ee689813dff3971c62264be1f72a72e865773b77239b1bdff66cbc75caa3f2) {
+            self~$TONLottery$_internal_text_c2ee689813dff3971c62264be1f72a72e865773b77239b1bdff66cbc75caa3f2();
+            return (self, true);
+        }
+        
+        ;; Receive "Return request" message
+        if (text_op == 0x8bd7dfb4e54bc7a587fcd3d02b7ae6cd1f6c6dd3a1f8a8c556d00b9e361e6ab1) {
+            self~$TONLottery$_internal_text_8bd7dfb4e54bc7a587fcd3d02b7ae6cd1f6c6dd3a1f8a8c556d00b9e361e6ab1();
+            return (self, true);
+        }
+    }
+    
+    return (self, false);
+}
+
+() recv_internal(int msg_value, cell in_msg_cell, slice in_msg) impure {
+    
+    ;; Context
+    var cs = in_msg_cell.begin_parse();
+    var msg_flags = cs~load_uint(4);
+    var msg_bounced = -(msg_flags & 1);
+    slice msg_sender_addr = __tact_verify_address(cs~load_msg_addr());
+    __tact_context = (msg_bounced, msg_sender_addr, msg_value, cs);
+    __tact_context_sender = msg_sender_addr;
+    
+    ;; Load contract data
+    var self = $TONLottery$_contract_load();
+    
+    ;; Handle operation
+    int handled = self~$TONLottery$_contract_router_internal(msg_bounced, in_msg);
+    
+    ;; Throw if not handled
+    throw_unless(130, handled);
+    
+    ;; Persist state
+    $TONLottery$_contract_store(self);
+}

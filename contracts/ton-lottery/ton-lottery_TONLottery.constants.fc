@@ -1,0 +1,9 @@
+;; Comment "Reward winner"
+cell __gen_cell_comment_7276e3adb1b4c34af9f0c13ce18fb84a3fd6ba8a48455fc3d0c9a7eec2e120c5() asm """
+    B{b5ee9c72410101010013000022000000005265776172642077696e6e657294e8dd9f} B>boc PUSHREF
+""";
+
+;; Comment "Send amount"
+cell __gen_cell_comment_e7ac5b1ffe9b77668a111d29d525818112685339a7b945eb31c2a97b9f3e3404() asm """
+    B{b5ee9c7241010101001100001e0000000053656e6420616d6f756e74f9d30b9b} B>boc PUSHREF
+""";
